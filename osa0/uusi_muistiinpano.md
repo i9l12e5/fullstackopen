@@ -18,14 +18,14 @@ sequenceDiagram
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
     activate server
     server->>browser: CSS file
-    Note left of browser: .container {
+    Note left of browser: ".container {
                             padding: 10px;
                             border: 1px solid
                             }
 
                             .notes {
                             color: blue;
-                            }
+                            }"
     Note right of server: Styling for container and notes
     deactivate server
 
