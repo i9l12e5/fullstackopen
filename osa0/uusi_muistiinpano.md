@@ -31,5 +31,5 @@ sequenceDiagram
     activate server
     server->>browser: JSON Object
     Note left of browser: [{ "content": "second note", "date": "2024-11-11T17:32:05.537Z" }, ...]
-    Note right of server: Data payload of last 100 notes
+    Note right of server: Data response of last 100 notes
     deactivate server
