@@ -27,7 +27,6 @@ sequenceDiagram
     activate server
     server->>browser: JavaScript file
     Note right of server: Serve JavaScript file content to browser
-    Note right of server: Don't serve new one, if identical exists, use cached file instead
     deactivate server
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
