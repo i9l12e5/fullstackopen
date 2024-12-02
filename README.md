@@ -2,4 +2,4 @@
 
 - [x] osa 0 
 - [x] osa 1
-- [ ] osa 2
+- [x] osa 2
