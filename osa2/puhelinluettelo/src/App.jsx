@@ -42,7 +42,7 @@ const App = () => {
 			)
 		) {
 			axios
-				.put(`http://localhost:3001/persons/${find.id}`, {
+				.put(`http://localhost:3001/api/persons/${find.id}`, {
 					...find,
 					number: newNumber,
 				})
@@ -76,7 +76,7 @@ const App = () => {
 		if (newName === "" || checkNames(newName)) return;
 
 		axios
-			.post("http://localhost:3001/persons", {
+			.post("http://localhost:3001/api/persons", {
 				name: newName,
 				number: newNumber,
 				/* id: persons.length + 1, */
@@ -101,7 +101,7 @@ const App = () => {
 
 		if (window.confirm(`Delete ${getName.name}`)) {
 			axios
-				.delete(`http://localhost:3001/persons/${contact}`)
+				.delete(`http://localhost:3001/api/persons/${contact}`)
 				.then(() => snackMsg(true, 3, `Deleted ${getName.name} from phonebook`))
 				.then(fetchContacts())
 				.catch((e) => {
@@ -114,7 +114,7 @@ const App = () => {
 
 	const fetchContacts = () =>
 		axios
-			.get("http://localhost:3001/persons/")
+			.get("http://localhost:3001/api/persons/")
 			.then((response) => {
 				setPersons(response.data);
 			})
