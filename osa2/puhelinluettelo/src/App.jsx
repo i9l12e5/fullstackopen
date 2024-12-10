@@ -80,11 +80,11 @@ const App = () => {
 			.post(`${baseUrl}/api/persons`, {
 				name: newName,
 				number: newNumber,
-				/* id: persons.length + 1, */
 			})
 			.then(() => snackMsg(true, 1, `Added ${newName} to phonebook`))
 			.then(() => fetchContacts())
-			.catch(() => snackMsg(true, 3, `Failed to add ${newName} as contact`));
+			.catch((error) => 
+				snackMsg(true, 3, error.response.data.error /* `Failed to add ${newName} as contact` */));
 	};
 
 	const filteredResults = () => {
