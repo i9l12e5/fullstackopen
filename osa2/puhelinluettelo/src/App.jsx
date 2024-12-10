@@ -1,9 +1,9 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
+import { FilterInput } from "./components/filterInput";
+import { SnackPopup } from "./components/snackPopup";
 import { UserForm } from "./components/userForm";
 import { UserList } from "./components/userList";
-import { FilterInput } from "./components/filterInput";
-import axios from "axios";
-import { SnackPopup } from "./components/snackPopup";
 
 const App = () => {
 	const baseUrl = process.env.NODE_ENV ? "" : "http://localhost:3001";
@@ -83,7 +83,7 @@ const App = () => {
 			})
 			.then(() => snackMsg(true, 1, `Added ${newName} to phonebook`))
 			.then(() => fetchContacts())
-			.catch((error) => 
+			.catch((error) =>
 				snackMsg(true, 3, error.response.data.error /* `Failed to add ${newName} as contact` */));
 	};
 
