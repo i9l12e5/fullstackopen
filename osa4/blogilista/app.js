@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const blogRouter = require("./controllers/blogs");
 const { MONGODB_URI } = require("./utils/config");
 const logger = require("./utils/logger");
+const usersRouter = require("./controllers/users");
 
 mongoose
 	.connect(MONGODB_URI)
@@ -20,5 +21,6 @@ app.use(express.static("dist"));
 app.use(express.json());
 
 app.use("/api/blogs", blogRouter);
+app.use("/user", usersRouter);
 
 module.exports = app;

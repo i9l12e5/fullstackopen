@@ -20,10 +20,26 @@ const initialBlogs = [
 const newBlog = { title: "Blog 5", author: "Blogger F", url: "NA", likes: 0 };
 const invalidBlog = { author: "Blogger G", likes: 10 };
 
+const initialUsers = [
+	{ name: "User 1", password: "user1", username: "usr_one" },
+	{ name: "User 2", password: "user2", username: "usr_two" },
+	{ name: "User 3", password: "user3", username: "usr_three" },
+	{ name: "User 4", password: "user4", username: "usr_four" },
+];
+
+const invalidUsers = [
+	{ name: "User 5", password: "u5", username: "usr_five" },
+	{ name: "User 6", password: "user6", username: "ix" },
+	{ name: "User 7", password: "u7", username: "usr_seven" },
+	/* { name: "user 8", password: "user8", username: "usr_eight" } */
+];
+
 module.exports = {
 	reverse,
 	average,
 	initialBlogs,
 	newBlog,
 	invalidBlog,
+	initialUsers,
+	invalidUsers,
 };
