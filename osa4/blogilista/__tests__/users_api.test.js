@@ -54,6 +54,22 @@ describe("Test users CRUD", () => {
 		// Check that invalid user didn't get registered
 		assert.strictEqual(startUsers.length, endUsers.length);
 	});
+
+	test("Test that duplicate usernames are prevented", async () => {
+		const startUsers = await usersInDb();
+
+		const users = await api
+			.post("/user/register")
+			.send(initialUsers[0])
+			.expect(400);
+
+		const endUsers = await usersInDb();
+
+		assert(users.error.text.includes("Username already taken!"));
+
+		// Check that invalid user didn't get registered
+		assert.strictEqual(startUsers.length, endUsers.length);
+	});
 });
 
 after(async () => {
