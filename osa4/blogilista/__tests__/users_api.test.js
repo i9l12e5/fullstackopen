@@ -3,7 +3,11 @@ const supertest = require("supertest");
 const app = require("../app");
 const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
-const { initialUsers, invalidUsers } = require("../utils/for_testing");
+const {
+	initialUsers,
+	invalidUsers,
+	usersInDb,
+} = require("../utils/for_testing");
 const assert = require("node:assert");
 
 const api = supertest(app);
@@ -30,17 +34,25 @@ describe("Test users CRUD", () => {
 	});
 
 	test(`Test that user amount in db is ${initialUsers.length}`, async () => {
-		const fetchCurrentUsers = await User.find({});
+		const fetchCurrentUsers = await usersInDb();
 
 		assert.strictEqual(fetchCurrentUsers.length, initialUsers.length);
 	});
 
 	test("Test invalid user registration", async () => {
-		const users = invalidUsers.map((user) => {
-			return api.post("/user/register").send(user).expect(400);
-		});
+		const startUsers = await usersInDb();
 
-		await Promise.all(users);
+		const users = await api
+			.post("/user/register")
+			.send(invalidUsers[0])
+			.expect(400);
+
+		const endUsers = await usersInDb();
+
+		assert(users.error.text.includes("Password or username too short!"));
+
+		// Check that invalid user didn't get registered
+		assert.strictEqual(startUsers.length, endUsers.length);
 	});
 });
 

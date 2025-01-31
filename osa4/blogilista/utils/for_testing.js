@@ -1,3 +1,5 @@
+const user = require("../models/user");
+
 const reverse = (string) => {
 	return string.split("").reverse().join("");
 };
@@ -8,6 +10,11 @@ const average = (array) => {
 	};
 
 	return array.length === 0 ? 0 : array.reduce(reducer, 0) / array.length;
+};
+
+const usersInDb = async () => {
+	const users = await user.find({});
+	return users.map((u) => u.toJSON());
 };
 
 const initialBlogs = [
@@ -31,12 +38,12 @@ const invalidUsers = [
 	{ name: "User 5", password: "u5", username: "usr_five" },
 	{ name: "User 6", password: "user6", username: "ix" },
 	{ name: "User 7", password: "u7", username: "usr_seven" },
-	/* { name: "user 8", password: "user8", username: "usr_eight" } */
 ];
 
 module.exports = {
 	reverse,
 	average,
+	usersInDb,
 	initialBlogs,
 	newBlog,
 	invalidBlog,
