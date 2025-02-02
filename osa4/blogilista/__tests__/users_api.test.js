@@ -67,7 +67,7 @@ describe("Test users CRUD", () => {
 
 		assert(users.error.text.includes("Username already taken!"));
 
-		// Check that invalid user didn't get registered
+		// Check that duplicate user didn't get registered
 		assert.strictEqual(startUsers.length, endUsers.length);
 	});
 });
