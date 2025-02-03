@@ -71,14 +71,51 @@ blogRouter.post("/", async (request, response) => {
 });
 
 // Route to delete single blog
-blogRouter.delete("/delete/:id", async (request, response) => {
+blogRouter.delete("/:id", async (request, response) => {
 	const blogId = request.params.id;
+	const token = request.token;
+
+	// Reject if token not found
+	if (!token)
+		return response
+			.status(403)
+			.json("Only logged in users can delete posts!")
+			.end();
 
 	try {
+		// Find user with token
+		const decodedToken = jwt.verify(token, process.env.SECRET);
+
+		// Find the requested blog
+		const getBlog = await Blog.findById({ _id: blogId });
+
+		// Catch null response, because it won't trigger anything past this point
+		if (getBlog === null)
+			return response
+				.status(404)
+				.json({ error: "No blog found by provided ID" });
+
+		// Check that user is poster of requested blog
+		if (getBlog.user.toString() !== decodedToken.id) {
+			return response.status(403).json({
+				error: "Only original poster is allowed to delete this blog post!",
+			});
+		}
+
+		// Proceed with delete process
 		await Blog.findOneAndDelete({ _id: blogId });
-		return response.status(204).end();
+		return response.status(200).json(`Blog ID ${blogId} deleted successfully!`);
 	} catch (error) {
-		return response.status(400).end();
+		// If decodedToken fails to verify user
+		if (error.name === "JsonWebTokenError") {
+			return response.status(401).json({ error: "Token invalid!" });
+		}
+
+		// General error message
+		return response
+			.status(400)
+			.json({ error: `Something went wrong! (${error.message})` })
+			.end();
 	}
 });
 
