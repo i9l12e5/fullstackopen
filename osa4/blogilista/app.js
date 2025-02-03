@@ -7,6 +7,7 @@ const { MONGODB_URI } = require("./utils/config");
 const logger = require("./utils/logger");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+const { tokenParser } = require("./utils/tokenParser");
 
 mongoose
 	.connect(MONGODB_URI)
@@ -20,6 +21,8 @@ mongoose
 app.use(cors());
 app.use(express.static("dist"));
 app.use(express.json());
+
+app.use(tokenParser);
 
 app.use("/api/blogs", blogRouter);
 app.use("/user", usersRouter);
