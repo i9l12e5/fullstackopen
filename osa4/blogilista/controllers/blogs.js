@@ -36,11 +36,7 @@ blogRouter.post("/", async (request, response) => {
 			return response.status(401).json({ error: "token invalid" });
 		}
 
-		console.log("--> ", decodedToken);
-		console.log(body);
-
 		const user = await User.findById(decodedToken.id);
-		console.log("...", user);
 
 		if (!Number.isFinite(body.likes)) {
 			// Check that likes has valid value
@@ -63,9 +59,9 @@ blogRouter.post("/", async (request, response) => {
 		const save = await blog.save();
 
 		// Add blog ID to user blogs
-		console.log("1: ", user);
+
 		user.blogs = user.blogs.concat(blog._id);
-		console.log("2: ", user);
+
 		await user.save();
 
 		response.status(201).json(save);
