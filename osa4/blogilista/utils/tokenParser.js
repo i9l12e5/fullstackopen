@@ -1,4 +1,4 @@
-export const tokenParser = (request, response, next) => {
+const tokenParser = (request, response, next) => {
 	const authorization = request.get("authorization");
 	if (authorization?.startsWith("Bearer ")) {
 		request.token = authorization.replace("Bearer ", "");
@@ -8,3 +8,5 @@ export const tokenParser = (request, response, next) => {
 
 	next();
 };
+
+module.exports = tokenParser;

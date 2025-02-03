@@ -2,6 +2,7 @@ const blogRouter = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const userParser = require("../utils/userParser");
 
 // Get all blog entries
 blogRouter.get("/", async (request, response) => {
@@ -73,7 +74,7 @@ blogRouter.post("/", async (request, response) => {
 // Route to delete single blog
 blogRouter.delete("/:id", async (request, response) => {
 	const blogId = request.params.id;
-	const token = request.token;
+	const token = request.user;
 
 	// Reject if token not found
 	if (!token)
@@ -83,9 +84,6 @@ blogRouter.delete("/:id", async (request, response) => {
 			.end();
 
 	try {
-		// Find user with token
-		const decodedToken = jwt.verify(token, process.env.SECRET);
-
 		// Find the requested blog
 		const getBlog = await Blog.findById({ _id: blogId });
 
@@ -96,7 +94,7 @@ blogRouter.delete("/:id", async (request, response) => {
 				.json({ error: "No blog found by provided ID" });
 
 		// Check that user is poster of requested blog
-		if (getBlog.user.toString() !== decodedToken.id) {
+		if (getBlog.user.toString() !== token.id) {
 			return response.status(403).json({
 				error: "Only original poster is allowed to delete this blog post!",
 			});
@@ -106,29 +104,11 @@ blogRouter.delete("/:id", async (request, response) => {
 		await Blog.findOneAndDelete({ _id: blogId });
 		return response.status(200).json(`Blog ID ${blogId} deleted successfully!`);
 	} catch (error) {
-		// If decodedToken fails to verify user
-		if (error.name === "JsonWebTokenError") {
-			return response.status(401).json({ error: "Token invalid!" });
-		}
-
 		// General error message
 		return response
 			.status(400)
 			.json({ error: `Something went wrong! (${error.message})` })
 			.end();
-	}
-});
-
-// Route to update blog entry
-blogRouter.put("/update/:id", async (request, response) => {
-	const blogId = request.params.id;
-	const body = request.body;
-
-	try {
-		await Blog.findByIdAndUpdate({ _id: blogId }, { $set: body });
-		return response.status(200).end();
-	} catch (error) {
-		return response.status(400).end();
 	}
 });
 
