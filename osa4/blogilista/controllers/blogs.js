@@ -1,6 +1,15 @@
 const blogRouter = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+
+const getTokenFrom = (request) => {
+	const authorization = request.get("authorization");
+	if (authorization?.startsWith("Bearer ")) {
+		return authorization.replace("Bearer ", "");
+	}
+	return null;
+};
 
 // Get all blog entries
 blogRouter.get("/", async (request, response) => {
@@ -19,19 +28,27 @@ blogRouter.get("/", async (request, response) => {
 // Post new blog entry
 blogRouter.post("/", async (request, response) => {
 	const body = request.body;
-	console.log(body);
-
-	const user = await User.find({}); // Find all and we'll use first one
-	console.log(user);
+	const token = getTokenFrom(request);
 
 	try {
-		// Check that likes has valid value
+		const decodedToken = jwt.verify(token, process.env.SECRET);
+		if (!decodedToken.id) {
+			return response.status(401).json({ error: "token invalid" });
+		}
+
+		console.log("--> ", decodedToken);
+		console.log(body);
+
+		const user = await User.findById(decodedToken.id);
+		console.log("...", user);
+
 		if (!Number.isFinite(body.likes)) {
+			// Check that likes has valid value
 			body.likes = 0;
 		}
 
-		// Check for missing title and URL
 		if (!body.title || !body.url) {
+			// Check for missing title and URL
 			return response.status(400).end();
 		}
 
@@ -40,19 +57,26 @@ blogRouter.post("/", async (request, response) => {
 			author: body.author,
 			url: body.url,
 			likes: body.likes,
-			user: user[0].id, // Add user as submitter for new post
+			user: user._id, // Add user as submitter for new post
 		});
 
 		const save = await blog.save();
 
 		// Add blog ID to user blogs
-		user[0].blogs = user[0].blogs.concat(blog._id);
-		await user[0].save();
+		console.log("1: ", user);
+		user.blogs = user.blogs.concat(blog._id);
+		console.log("2: ", user);
+		await user.save();
 
 		response.status(201).json(save);
 	} catch (error) {
 		if (error.name === "ValidationError") {
 			return response.status(400).end();
+		}
+
+		// Prevents server crash
+		if (error.name === "JsonWebTokenError") {
+			return response.status(401).json({ error: "invalid token" });
 		}
 	}
 });
