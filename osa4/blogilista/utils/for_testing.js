@@ -27,6 +27,8 @@ const initialBlogs = [
 const newBlog = { title: "Blog 5", author: "Blogger F", url: "NA", likes: 0 };
 const invalidBlog = { author: "Blogger G", likes: 10 };
 
+const superUser = { name: "Superuser", password: "root", username: "Root" };
+
 const initialUsers = [
 	{ name: "User 1", password: "user1", username: "usr_one" },
 	{ name: "User 2", password: "user2", username: "usr_two" },
@@ -46,6 +48,7 @@ module.exports = {
 	usersInDb,
 	initialBlogs,
 	newBlog,
+	superUser,
 	invalidBlog,
 	initialUsers,
 	invalidUsers,

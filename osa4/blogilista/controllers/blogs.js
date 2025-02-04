@@ -1,7 +1,5 @@
 const blogRouter = require("express").Router();
 const Blog = require("../models/blog");
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
 const userParser = require("../utils/userParser");
 
 // Get all blog entries
@@ -19,19 +17,11 @@ blogRouter.get("/", async (request, response) => {
 });
 
 // Post new blog entry
-blogRouter.post("/", async (request, response) => {
+blogRouter.post("/", userParser, async (request, response) => {
 	const body = request.body;
-	const token = request.token;
+	const user = request.user;
 
 	try {
-		const decodedToken = jwt.verify(token, process.env.SECRET);
-
-		if (!decodedToken.id) {
-			return response.status(401).json({ error: "token invalid" });
-		}
-
-		const user = await User.findById(decodedToken.id);
-
 		if (!Number.isFinite(body.likes)) {
 			// Check that likes has valid value
 			body.likes = 0;
@@ -72,7 +62,7 @@ blogRouter.post("/", async (request, response) => {
 });
 
 // Route to delete single blog
-blogRouter.delete("/:id", async (request, response) => {
+blogRouter.delete("/:id", userParser, async (request, response) => {
 	const blogId = request.params.id;
 	const token = request.user;
 
@@ -109,6 +99,19 @@ blogRouter.delete("/:id", async (request, response) => {
 			.status(400)
 			.json({ error: `Something went wrong! (${error.message})` })
 			.end();
+	}
+});
+
+// Route to update blog entry
+blogRouter.put("/update/:id", async (request, response) => {
+	const blogId = request.params.id;
+	const body = request.body;
+
+	try {
+		await Blog.findByIdAndUpdate({ _id: blogId }, { $set: body });
+		return response.status(200).end();
+	} catch (error) {
+		return response.status(400).end();
 	}
 });
 

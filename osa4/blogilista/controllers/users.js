@@ -10,6 +10,7 @@ usersRouter.post("/register", async (request, response) => {
 
 	const checkName = await User.findOne({ username: username });
 
+	// TODO: some edge cases slips past this
 	if (checkName !== null)
 		return response.status(400).end("Username already taken!");
 
@@ -20,6 +21,7 @@ usersRouter.post("/register", async (request, response) => {
 		username,
 		name,
 		passwordHash,
+		blogs: [],
 	});
 
 	const savedUser = await newUser.save();

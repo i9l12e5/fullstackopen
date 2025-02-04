@@ -8,7 +8,6 @@ const logger = require("./utils/logger");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
 const tokenParser = require("./utils/tokenParser");
-const userParser = require("./utils/userParser");
 
 mongoose
 	.connect(MONGODB_URI)
@@ -25,7 +24,7 @@ app.use(express.json());
 
 app.use(tokenParser);
 
-app.use("/api/blogs", userParser, blogRouter);
+app.use("/api/blogs", blogRouter);
 app.use("/user", usersRouter);
 app.use("/login", loginRouter);
 
