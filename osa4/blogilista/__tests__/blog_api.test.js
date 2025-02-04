@@ -109,8 +109,8 @@ describe("Test blog CRUD", () => {
 			.expect(200)
 			.expect("Content-Type", /application\/json/);
 
-		assert.strictEqual(start.body.length, 3); // Start should be 3 after last test removed 1
-		assert.strictEqual(end.body.length, 4); // End should be 4 after adding 1
+		assert.strictEqual(start.body.length, initialBlogs.length - 1); // Start should be 3 after last test removed 1
+		assert.strictEqual(end.body.length, start.body.length + 1); // End should be 4 after adding 1
 
 		const authors = end.body.map((find) => find.author);
 		assert(authors.includes("Blogger D"));
