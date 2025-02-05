@@ -8,7 +8,6 @@ const {
 	initialBlogs,
 	newBlog,
 	invalidBlog,
-	initialUsers,
 	superUser,
 } = require("../utils/for_testing");
 const user = require("../models/user");
