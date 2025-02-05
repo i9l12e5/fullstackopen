@@ -1,6 +1,6 @@
-const { test, describe } = require("node:test");
+const { test, describe, after } = require("node:test");
 const assert = require("node:assert");
-
+const mongoose = require("mongoose");
 const reverse = require("../utils/for_testing").reverse;
 
 describe("reverse test", () => {
@@ -21,4 +21,8 @@ describe("reverse test", () => {
 
 		assert.strictEqual(result, "saippuakauppias");
 	});
+});
+
+after(async () => {
+	await mongoose.connection.close();
 });

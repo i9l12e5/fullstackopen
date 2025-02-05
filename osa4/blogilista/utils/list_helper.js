@@ -9,6 +9,8 @@ const totalLikes = (blogs) => {
 };
 
 const favoriteBlog = (blogs) => {
+	if (blogs.length === 0) return null;
+
 	const result = blogs.reduce((a, b) => {
 		return b.likes > a.likes ? b : a;
 	});
@@ -18,6 +20,7 @@ const favoriteBlog = (blogs) => {
 };
 
 const mostBlogs = (blogs) => {
+	if (blogs.length === 0) return null;
 	const count = _.countBy(blogs, "author");
 
 	const mostAuthored = _.maxBy(
@@ -33,6 +36,7 @@ const mostBlogs = (blogs) => {
 };
 
 const mostLikes = (blogs) => {
+	if (blogs.length === 0) return null;
 	// Group blogs by author
 	const count = _.groupBy(blogs, "author");
 	/* console.log(count); */

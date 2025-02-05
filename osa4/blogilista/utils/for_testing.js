@@ -13,8 +13,13 @@ const average = (array) => {
 };
 
 const usersInDb = async () => {
-	const users = await user.find({});
-	return users.map((u) => u.toJSON());
+	try {
+		const users = await user.find({});
+		return users.map((u) => u.toJSON());
+	} catch (error) {
+		console.error("Error fetching users from DB:", error);
+		return [];
+	}
 };
 
 const initialBlogs = [

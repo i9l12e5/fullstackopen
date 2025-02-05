@@ -1,4 +1,5 @@
-const { test, describe } = require("node:test");
+const mongoose = require("mongoose");
+const { test, describe, after } = require("node:test");
 const assert = require("node:assert");
 
 const average = require("../utils/for_testing").average;
@@ -15,4 +16,8 @@ describe("average test", () => {
 	test("of empty array is zero", () => {
 		assert.strictEqual(average([]), 0);
 	});
+});
+
+after(async () => {
+	await mongoose.connection.close();
 });

@@ -4,7 +4,7 @@ const { MONGODB_URI } = require("../utils/config");
 mongoose
 	.connect(MONGODB_URI)
 	.then((result) => {
-		console.log("connected to MongoDB");
+		console.log("User: connected to MongoDB");
 	})
 	.catch((error) => {
 		console.log("error connecting to MongoDB:", error.message);
