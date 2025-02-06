@@ -1,4 +1,4 @@
-const { test, after, beforeEach, describe } = require("node:test");
+const { test, after, describe, beforeEach, before } = require("node:test");
 const supertest = require("supertest");
 const app = require("../app");
 const { default: mongoose } = require("mongoose");
@@ -7,6 +7,7 @@ const {
 	initialUsers,
 	invalidUsers,
 	usersInDb,
+	singleUser,
 } = require("../utils/for_testing");
 const assert = require("node:assert");
 
@@ -14,16 +15,11 @@ const api = supertest(app);
 
 describe("Test users CRUD", () => {
 	beforeEach(async () => {
-		// Clear all users from test database
+		// Delete all users from db
 		await User.deleteMany({});
-		console.log("Reset users database");
 
-		// Create and save four new users to test database
-		const userObjects = initialUsers.map((user) => {
-			return api.post("/user/register").send(user).expect(201);
-		});
-
-		await Promise.all(userObjects);
+		// Initialize users
+		await User.insertMany(initialUsers);
 	});
 
 	test("users are returned as JSON", async () => {
@@ -33,10 +29,12 @@ describe("Test users CRUD", () => {
 			.expect("Content-Type", /application\/json/);
 	});
 
-	test(`Test that user amount in db is ${initialUsers.length}`, async () => {
-		const fetchCurrentUsers = await usersInDb();
+	test("Test user registeration", async () => {
+		await api.post("/user/register").send(singleUser).expect(201);
 
-		assert.strictEqual(fetchCurrentUsers.length, initialUsers.length);
+		const fetchUsers = await usersInDb();
+
+		assert.strictEqual(fetchUsers.length, 1);
 	});
 
 	test("Test invalid user registration", async () => {
@@ -63,9 +61,9 @@ describe("Test users CRUD", () => {
 			.send(initialUsers[0])
 			.expect(400);
 
-		const endUsers = await usersInDb();
-
 		assert(users.error.text.includes("Username already taken!"));
+
+		const endUsers = await usersInDb();
 
 		// Check that duplicate user didn't get registered
 		assert.strictEqual(startUsers.length, endUsers.length);

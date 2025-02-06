@@ -1,58 +1,34 @@
-const { test, after, describe, before } = require("node:test");
+const { test, after, describe, before, beforeEach } = require("node:test");
 const assert = require("node:assert");
 const supertest = require("supertest");
 const app = require("../app");
 const { default: mongoose } = require("mongoose");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 const {
 	initialBlogs,
 	newBlog,
 	invalidBlog,
-	superUser,
+	addSuperUser,
+	blogsInDb,
+	superUserLogin,
 } = require("../utils/for_testing");
-const user = require("../models/user");
 
 const api = supertest(app);
 
-const Login = async () => {
-	const user = await api.post("/login/").send({
-		username: superUser.username,
-		password: superUser.password,
-	});
-
-	return user.body;
-};
-
 describe("Test blog CRUD", () => {
-	before(async () => {
+	beforeEach(async () => {
+		// Delete all users from db
+		await User.deleteMany({});
+
+		// Initialize superuser
+		await addSuperUser();
+
 		// Clear all blogs from test database
 		await Blog.deleteMany({});
-		const checkBlogs = await api.get("/api/blogs").expect(200);
 
-		assert.strictEqual(checkBlogs.body.length, 0);
-
-		// Delete all users from db
-		await user.deleteMany({});
-
-		console.log("Reset database");
-
-		// Create superuser account
-		await api.post("/user/register").send(superUser).expect(201);
-
-		const users = await user.find({});
-		assert.strictEqual(users.length, 1);
-
-		// Login as superuser
-		const superuser = await Login();
-
-		// Create and save 4 blogs to test database, map causes async problems saving ids to user blogs
-		for (const blog of initialBlogs) {
-			await api
-				.post("/api/blogs")
-				.set("Authorization", `Bearer ${superuser.token}`)
-				.send(blog)
-				.expect(201);
-		}
+		// Initialize blogs
+		await Blog.insertMany(initialBlogs);
 	});
 
 	test("There should be 4 blogs on db", async () => {
@@ -68,51 +44,30 @@ describe("Test blog CRUD", () => {
 			.expect("Content-Type", /application\/json/);
 	});
 
-	test("Remove first blog", async () => {
-		// Login as superuser
-		const superuser = await Login();
+	test("Add and remove blog", async () => {
+		const loggedIn = await api.post("/login").send(superUserLogin).expect(200);
 
-		const getBlogs = await api.get("/api/blogs").expect(200);
-		const getFirst = getBlogs.body[0];
-
-		await api
-			.delete(`/api/blogs/${getFirst.id}`)
-			.set("Authorization", `Bearer ${superuser.token}`)
-			.expect(200);
-
-		const response = await api.get("/api/blogs").expect(200);
-
-		assert.strictEqual(response.body.length, initialBlogs.length - 1);
-	});
-
-	test("Add new blog", async () => {
-		// Login as superuser
-		const superuser = await Login();
-
-		// Check that database has only 4 blog entrys
-		const start = await api
-			.get("/api/blogs")
-			.expect(200)
-			.expect("Content-Type", /application\/json/);
-
-		// Add new blog
 		await api
 			.post("/api/blogs")
-			.set("Authorization", `Bearer ${superuser.token}`)
+			.set("Authorization", `Bearer ${loggedIn.body.token}`)
 			.send(newBlog)
 			.expect(201);
 
-		// Check that new blog was added to database
-		const end = await api
-			.get("/api/blogs")
-			.expect(200)
-			.expect("Content-Type", /application\/json/);
+		const midCheck = await blogsInDb();
+		const authors = midCheck.map((find) => find.author);
+		assert(authors.includes("Blogger F"));
 
-		assert.strictEqual(start.body.length, initialBlogs.length - 1); // Start should be 3 after last test removed 1
-		assert.strictEqual(end.body.length, start.body.length + 1); // End should be 4 after adding 1
+		const getOne = midCheck.find((blog) => blog.author === newBlog.author); // Cheap solution to get the one blog with user info we just added
 
-		const authors = end.body.map((find) => find.author);
-		assert(authors.includes("Blogger D"));
+		await api
+			.delete(`/api/blogs/${getOne.id}`)
+			.set("Authorization", `Bearer ${loggedIn.body.token}`)
+			.expect(200);
+
+		const endBlogs = await blogsInDb();
+
+		assert.strictEqual(midCheck.length, initialBlogs.length + 1);
+		assert.strictEqual(endBlogs.length, initialBlogs.length);
 	});
 
 	test("Test update route", async () => {
@@ -130,12 +85,11 @@ describe("Test blog CRUD", () => {
 	});
 
 	test("Check that invalid blog posts are rejected with error 400", async () => {
-		// Login as superuser
-		const superuser = await Login();
+		const loginUser = await api.post("/login").send(superUserLogin);
 
 		await api
 			.post("/api/blogs")
-			.set("Authorization", `Bearer ${superuser.token}`)
+			.set("Authorization", `Bearer ${loginUser.body.token}`)
 			.send(invalidBlog)
 			.expect(400);
 	});

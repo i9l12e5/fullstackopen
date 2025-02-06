@@ -12,8 +12,8 @@ mongoose
 
 const userSchema = mongoose.Schema({
 	username: { type: String, required: true, unique: true },
-	passwordHash: { type: String, required: true },
-	name: { type: String, required: true },
+	passwordHash: { type: String },
+	name: { type: String },
 	blogs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
 });
 
