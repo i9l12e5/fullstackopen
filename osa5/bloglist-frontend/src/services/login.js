@@ -1,8 +1,8 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/config";
 
-const login = async (data) =>
-	await axios
+const login = (data) =>
+	axios
 		.post(`${BASE_URL}/login`, data)
 		.then((res) => {
 			return res;

@@ -3,19 +3,21 @@ import { BASE_URL } from "../utils/config";
 
 const API_PATH = "/api/blogs";
 
-const getAll = () => {
-	const request = axios.get(BASE_URL + API_PATH);
-	return request.then((response) => response.data);
-};
+const getAll = () =>
+	axios.get(BASE_URL + API_PATH).then((response) => response.data);
 
-const postNew = (body, user) => {
-	const request = axios.post(BASE_URL + API_PATH, body, {
-		headers: {
-			Authorization: `Bearer ${user.token}`,
-		},
-	});
+const postNew = (body, user) =>
+	axios
+		.post(BASE_URL + API_PATH, body, {
+			headers: {
+				Authorization: `Bearer ${user.token}`,
+			},
+		})
+		.then((response) => response);
 
-	return request.then((res) => res);
-};
+const addLike = (body) =>
+	axios
+		.put(`${BASE_URL}${API_PATH}/update/${body.id}`, body)
+		.then((response) => response);
 
-export default { getAll, postNew };
+export default { getAll, postNew, addLike };

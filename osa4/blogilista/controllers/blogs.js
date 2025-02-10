@@ -109,8 +109,10 @@ blogRouter.put("/update/:id", async (request, response) => {
 
 	try {
 		await Blog.findByIdAndUpdate({ _id: blogId }, { $set: body });
+		console.log("tää");
 		return response.status(200).end();
 	} catch (error) {
+		/* console.log(error); */
 		return response.status(400).end();
 	}
 });

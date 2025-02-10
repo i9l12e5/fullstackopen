@@ -14,8 +14,8 @@ const App = () => {
 	const [status, setStatus] = useState(false);
 	const [message, setMessage] = useState(null);
 
-	const fetchBlogs = async () =>
-		await blogService.getAll().then((blogs) => setBlogs(blogs));
+	const fetchBlogs = () =>
+		blogService.getAll().then((blogs) => setBlogs(blogs));
 
 	const userLogout = () => {
 		setIsLogged(false);
@@ -23,45 +23,66 @@ const App = () => {
 		window.localStorage.clear("blogUserLoggedIn");
 	};
 
-	const handleLogin = async (body) => {
+	const handleLogin = (body) => {
 		if (!body.username || !body.password) return; // Catch empty
 
-		const result = await loginService.login(body);
+		loginService
+			.login(body)
+			.then((response) => {
+				if (response.status === 200) {
+					setMessage(null);
+					setIsLogged(true);
+					window.localStorage.setItem(
+						"blogUserLoggedIn",
+						JSON.stringify(response.data),
+					);
+					return;
+				}
 
-		if (result.status === 200) {
-			setMessage(null);
-			setIsLogged(true);
-			window.localStorage.setItem(
-				"blogUserLoggedIn",
-				JSON.stringify(result.data),
-			);
-			return;
-		}
-
-		if (result.status === 401) {
-			setIsLogged(false);
-			setStatus(false);
-			setMessage(result.data.error);
-			return;
-		}
-
-		setStatus(false);
-		setMessage(result?.data?.error || result?.data || "Jotakin meni vikaan!"); // Catch all for rest non-200/401 responses
+				if (response.status === 401) {
+					setIsLogged(false);
+					setStatus(false);
+					setMessage(response.data.error);
+					return;
+				}
+			})
+			.catch((error) => {
+				setStatus(false);
+				setMessage(error?.data?.error || "Jotakin meni vikaan!"); // Catch all for undefined errors
+			});
 	};
 
-	const handleSave = async (body) => {
-		const result = await blogService.postNew(body, user);
+	const handleSave = (body) => {
+		blogService
+			.postNew(body, user)
+			.then((response) => {
+				if (response.status === 201) {
+					setMessage(
+						`a new blog ${response.data.title} by ${response.data.author} added`,
+					);
+					setStatus(true);
+					fetchBlogs();
+				} else {
+					setMessage("Jotakin meni vikaan!");
+					setStatus(false);
+				}
+			})
+			.catch((error) => {
+				setMessage(
+					`Error ${error.response.status}:  ${error.response.statusText}`,
+				);
+				setStatus(false);
+			});
+	};
 
-		if (result.status === 201) {
-			setMessage(
-				`a new blog ${result.data.title} by ${result.data.author} added`,
-			);
-			setStatus(true);
-			fetchBlogs();
-		} else {
-			setMessage("Jotakin meni vikaan!");
-			setStatus(false);
-		}
+	const handleLikes = (body) => {
+		blogService
+			.addLike({
+				...body,
+				likes: body.likes + 1,
+				user: body.user.id,
+			})
+			.then(() => fetchBlogs());
 	};
 
 	useEffect(() => {
@@ -89,7 +110,7 @@ const App = () => {
 			<Create user={user} handleSave={handleSave} />
 
 			{blogs.map((blog) => (
-				<Blog key={blog.id} blog={blog} />
+				<Blog key={blog.id} blog={blog} handleLikeAdd={handleLikes} />
 			))}
 		</div>
 	) : (
