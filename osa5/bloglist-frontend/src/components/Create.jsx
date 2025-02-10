@@ -4,8 +4,15 @@ export const Create = ({ handleSave }) => {
 	const [title, setTitle] = useState(null);
 	const [author, setAuthor] = useState(null);
 	const [url, setUrl] = useState(null);
+	const [isHidden, setIsHidden] = useState(true);
 
-	return (
+	const toggleView = () => setIsHidden(!isHidden);
+
+	return isHidden ? (
+		<button type="button" onClick={toggleView}>
+			new note
+		</button>
+	) : (
 		<div>
 			<h2>create new</h2>
 
@@ -20,10 +27,20 @@ export const Create = ({ handleSave }) => {
 			<div>
 				url: <input onChange={(text) => setUrl(text.target.value)} />
 			</div>
+			<div>
+				<button
+					type="button"
+					onClick={() => handleSave({ title, author, url })}
+				>
+					create
+				</button>
+			</div>
 
-			<button type="button" onClick={() => handleSave({ title, author, url })}>
-				create
-			</button>
+			<div>
+				<button type="button" onClick={toggleView}>
+					cancel
+				</button>
+			</div>
 		</div>
 	);
 };
