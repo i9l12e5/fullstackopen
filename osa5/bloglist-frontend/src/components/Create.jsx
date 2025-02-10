@@ -6,6 +6,12 @@ export const Create = ({ handleSave }) => {
 	const [url, setUrl] = useState(null);
 	const [isHidden, setIsHidden] = useState(true);
 
+	const addNote = (event) => {
+		event.preventDefault();
+
+		handleSave({ title, author, url });
+	};
+
 	const toggleView = () => setIsHidden(!isHidden);
 
 	return isHidden ? (
@@ -28,10 +34,7 @@ export const Create = ({ handleSave }) => {
 				url: <input onChange={(text) => setUrl(text.target.value)} />
 			</div>
 			<div>
-				<button
-					type="button"
-					onClick={() => handleSave({ title, author, url })}
-				>
+				<button type="button" onClick={addNote}>
 					create
 				</button>
 			</div>
