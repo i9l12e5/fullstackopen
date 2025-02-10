@@ -83,14 +83,15 @@ const App = () => {
 			})
 			.then(() => fetchBlogs());
 
-	const handleRemove = (id) => {
-		console.log(id, user.id);
-
+	const handleRemove = (id) =>
 		blogService
 			.removeBlog(id, user.token)
-			.then(() => fetchBlogs())
+			.then(() => {
+				setMessage("blog removed successfully!");
+				setStatus(true);
+				fetchBlogs();
+			})
 			.catch((error) => console.log(error));
-	};
 
 	useEffect(() => {
 		const test = window.localStorage.getItem("blogUserLoggedIn");
