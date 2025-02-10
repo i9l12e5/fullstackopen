@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { useState } from "react";
 
 export const Create = ({ handleSave }) => {
@@ -46,4 +47,8 @@ export const Create = ({ handleSave }) => {
 			</div>
 		</div>
 	);
+};
+
+Create.propTypes = {
+	handleSave: PropTypes.func.isRequired,
 };

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { useState } from "react";
 
 const Login = ({ handleLogin }) => {
 	const [username, setUsername] = useState(null);
@@ -30,6 +31,10 @@ const Login = ({ handleLogin }) => {
 			{/* <button type="button">cancel</button> */}
 		</div>
 	);
+};
+
+Login.propTypes = {
+	handleLogin: PropTypes.func.isRequired,
 };
 
 export default Login;
