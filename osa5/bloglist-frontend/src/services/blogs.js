@@ -20,4 +20,11 @@ const addLike = (body) =>
 		.put(`${BASE_URL}${API_PATH}/update/${body.id}`, body)
 		.then((response) => response);
 
-export default { getAll, postNew, addLike };
+const removeBlog = (blog, user) =>
+	axios.delete(`${BASE_URL}${API_PATH}/${blog}`, {
+		headers: {
+			Authorization: `Bearer ${user}`,
+		},
+	});
+
+export default { getAll, postNew, addLike, removeBlog };

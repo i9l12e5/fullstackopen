@@ -52,7 +52,7 @@ const App = () => {
 			});
 	};
 
-	const handleSave = (body) => {
+	const handleSave = (body) =>
 		blogService
 			.postNew(body, user)
 			.then((response) => {
@@ -73,9 +73,8 @@ const App = () => {
 				);
 				setStatus(false);
 			});
-	};
 
-	const handleLikes = (body) => {
+	const handleLikes = (body) =>
 		blogService
 			.addLike({
 				...body,
@@ -83,6 +82,14 @@ const App = () => {
 				user: body.user.id,
 			})
 			.then(() => fetchBlogs());
+
+	const handleRemove = (id) => {
+		console.log(id, user.id);
+
+		blogService
+			.removeBlog(id, user.token)
+			.then(() => fetchBlogs())
+			.catch((error) => console.log(error));
 	};
 
 	useEffect(() => {
@@ -112,7 +119,13 @@ const App = () => {
 			{blogs
 				.sort((a, b) => a.likes < b.likes)
 				.map((blog) => (
-					<Blog key={blog.id} blog={blog} handleLikeAdd={handleLikes} />
+					<Blog
+						key={blog.id}
+						blog={blog}
+						user={user}
+						handleLikeAdd={handleLikes}
+						handleRemove={handleRemove}
+					/>
 				))}
 		</div>
 	) : (
