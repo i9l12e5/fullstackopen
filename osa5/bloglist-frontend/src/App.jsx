@@ -109,9 +109,11 @@ const App = () => {
 			<User data={user} handleClick={userLogout} />
 			<Create user={user} handleSave={handleSave} />
 
-			{blogs.map((blog) => (
-				<Blog key={blog.id} blog={blog} handleLikeAdd={handleLikes} />
-			))}
+			{blogs
+				.sort((a, b) => a.likes < b.likes)
+				.map((blog) => (
+					<Blog key={blog.id} blog={blog} handleLikeAdd={handleLikes} />
+				))}
 		</div>
 	) : (
 		<div>
