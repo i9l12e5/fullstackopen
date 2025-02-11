@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import Blog from "./Blog";
 
@@ -74,4 +75,37 @@ test("Verify like button is pressed twice", async () => {
 	await test.click(button2);
 
 	expect(mockHandler.mock.calls).toHaveLength(2);
+});
+
+test("Verify remove button is pressed successfully", async () => {
+	const mockHandler = vi.fn();
+
+	vi.spyOn(window, "confirm").mockReturnValue(true);
+
+	render(
+		<Blog
+			blog={blog}
+			user={user}
+			handleLikeAdd={mockHandler}
+			handleRemove={mockHandler}
+		/>,
+	);
+
+	const test = userEvent.setup();
+
+	const button1 = screen.getByText("view");
+
+	await test.click(button1);
+
+	const button2 = screen.getByText("remove");
+
+	await test.click(button2);
+
+	expect(window.confirm).toHaveBeenCalledWith(
+		`Remove blog ${blog.title} by ${blog.author}`,
+	);
+
+	expect(window.confirm).toHaveBeenCalledTimes(1);
+
+	expect(mockHandler.mock.calls).toHaveLength(1);
 });
