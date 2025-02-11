@@ -7,10 +7,18 @@ export const Create = ({ handleSave }) => {
 	const [url, setUrl] = useState(null);
 	const [isHidden, setIsHidden] = useState(true);
 
+	const clearForm = () => {
+		setTitle(null);
+		setAuthor(null);
+		setUrl(null);
+		setIsHidden(true);
+	};
+
 	const addNote = (event) => {
 		event.preventDefault();
 
 		handleSave({ title, author, url });
+		clearForm();
 	};
 
 	const toggleView = () => setIsHidden(!isHidden);
