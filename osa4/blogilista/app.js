@@ -7,6 +7,7 @@ const { MONGODB_URI } = require("./utils/config");
 const logger = require("./utils/logger");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+const testsRouter = require("./controllers/tests");
 const tokenParser = require("./utils/tokenParser");
 
 mongoose
@@ -27,5 +28,7 @@ app.use(tokenParser);
 app.use("/api/blogs", blogRouter);
 app.use("/user", usersRouter);
 app.use("/login", loginRouter);
+
+if (process.env.NODE_ENV === "development") app.use("/testing", testsRouter);
 
 module.exports = app;
