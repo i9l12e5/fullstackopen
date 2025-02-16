@@ -30,14 +30,17 @@ describe("Blog app", () => {
 
 		await page.locator("#login-button").click({ force: true });
 
-		const isVisible = await page.isVisible("#login-button");
+		/* const isVisible = await page.isVisible("#login-button");
 		const isEnabled = await page.isEnabled("#login-button");
-		console.log(`Login button is visible: ${isVisible}, enabled: ${isEnabled}`);
+		console.log(`Login button is visible: ${isVisible}, enabled: ${isEnabled}`); */
 
-		await page.screenshot({ path: "login-test-screenshot-invalid.png" });
+		await expect(page.getByText("invalid username or password")).toBeVisible({
+			timeout: 10000, // incase db takes longer to receive and respond
+		});
 
-		await expect(page.getByText("Username:")).toBeVisible();
-		await expect(page.getByText("Password:")).toBeVisible();
+		await page.screenshot({
+			path: "tests/screenshots/login-test-screenshot-invalid.png",
+		});
 	});
 
 	test("Test successful login", async ({ page }) => {
@@ -52,8 +55,12 @@ describe("Blog app", () => {
 
 		await page.locator("#login-button").click({ force: true });
 
-		await page.screenshot({ path: "login-test-screenshot.png" });
+		await expect(page.getByText(`${data.name} logged in`)).toBeVisible({
+			timeout: 10000, // incase db takes longer to receive and respond
+		});
 
-		await expect(page.getByText(`${data.name} logged in`)).toBeVisible();
+		await page.screenshot({
+			path: "tests/screenshots/login-test-screenshot.png",
+		});
 	});
 });
