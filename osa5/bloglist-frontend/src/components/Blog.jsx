@@ -12,15 +12,23 @@ const Blog = ({ blog, user, handleLikeAdd, handleRemove }) => {
 	return (
 		<div style={{ border: "solid black 1px", padding: "3px" }}>
 			{blog.title} {blog.author}{" "}
-			<button type="button" onClick={() => setInView(!inView)}>
+			<button
+				id="blog-view-button"
+				type="button"
+				onClick={() => setInView(!inView)}
+			>
 				view
 			</button>
 			{inView ? (
 				<div>
 					<div>{blog.url}</div>
-					<div>
+					<div id="blog-likes-div">
 						likes {blog.likes}{" "}
-						<button type="button" onClick={() => handleLikeAdd(blog)}>
+						<button
+							id="blog-like-button"
+							type="button"
+							onClick={() => handleLikeAdd(blog)}
+						>
 							like
 						</button>
 					</div>
