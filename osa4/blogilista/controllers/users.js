@@ -3,30 +3,34 @@ const usersRouter = require("express").Router();
 const User = require("../models/user");
 
 usersRouter.post("/register", async (request, response) => {
-	const { username, name, password } = request.body;
+	try {
+		const { username, name, password } = request.body;
 
-	if (username.length < 3 || password.length < 3)
-		return response.status(400).end("Password or username too short!");
+		if (request.body.length < 1)
+			return response.status(400).end("Received empty body!");
 
-	const checkName = await User.findOne({ username: username });
+		if (username.length < 3 || password.length < 3)
+			return response.status(400).end("Password or username too short!");
 
-	// TODO: some edge cases slips past this
-	if (checkName !== null)
-		return response.status(400).end("Username already taken!");
+		const saltRounds = 10;
+		const passwordHash = await bcrypt.hash(password, saltRounds);
 
-	const saltRounds = 10;
-	const passwordHash = await bcrypt.hash(password, saltRounds);
+		const newUser = new User({
+			username,
+			name,
+			passwordHash,
+			blogs: [],
+		});
 
-	const newUser = new User({
-		username,
-		name,
-		passwordHash,
-		blogs: [],
-	});
+		const savedUser = await newUser.save();
 
-	const savedUser = await newUser.save();
+		response.status(201).json(savedUser);
+	} catch (error) {
+		if (error.code === 11000)
+			return response.status(400).end("Username already taken!");
 
-	response.status(201).json(savedUser);
+		response.status(500).json({ error: "Internal server error" });
+	}
 });
 
 usersRouter.get("/", async (request, response) => {

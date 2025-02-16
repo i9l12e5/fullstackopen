@@ -3,10 +3,10 @@ const Blog = require("../models/blog");
 const User = require("../models/user");
 
 testsRouter.post("/reset", async (request, response) => {
-	await User.deleteMany({});
 	await Blog.deleteMany({});
+	await User.deleteMany({});
 
-	return response.status(200).json("Database cleared!");
+	return response.status(204).json("Database cleared!").end();
 });
 
 module.exports = testsRouter;
