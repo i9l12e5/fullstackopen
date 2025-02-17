@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 export const Status = ({ message, success }) => (
 	<div
-		id="status-message-div"
+		data-testid="status-message-div"
 		style={{
 			display: message ? "flex" : "none",
 			backgroundColor: "silver",

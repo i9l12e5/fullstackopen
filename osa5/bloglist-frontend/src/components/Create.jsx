@@ -24,7 +24,11 @@ export const Create = ({ handleSave }) => {
 	const toggleView = () => setIsHidden(!isHidden);
 
 	return isHidden ? (
-		<button id="open-create-blog-button" type="button" onClick={toggleView}>
+		<button
+			data-testid="open-create-blog-button"
+			type="button"
+			onClick={toggleView}
+		>
 			new blog
 		</button>
 	) : (
@@ -34,7 +38,7 @@ export const Create = ({ handleSave }) => {
 			<div>
 				title:{" "}
 				<input
-					id="title-input"
+					data-testid="title-input"
 					onChange={(text) => setTitle(text.target.value)}
 				/>
 			</div>
@@ -42,23 +46,26 @@ export const Create = ({ handleSave }) => {
 			<div>
 				author:{" "}
 				<input
-					id="author-input"
+					data-testid="author-input"
 					onChange={(text) => setAuthor(text.target.value)}
 				/>
 			</div>
 
 			<div>
 				url:{" "}
-				<input id="url-input" onChange={(text) => setUrl(text.target.value)} />
+				<input
+					data-testid="url-input"
+					onChange={(text) => setUrl(text.target.value)}
+				/>
 			</div>
 			<div>
-				<button id="create-button" type="button" onClick={addNote}>
+				<button data-testid="create-button" type="button" onClick={addNote}>
 					create
 				</button>
 			</div>
 
 			<div>
-				<button id="cancel-button" type="button" onClick={toggleView}>
+				<button data-testid="cancel-button" type="button" onClick={toggleView}>
 					cancel
 				</button>
 			</div>

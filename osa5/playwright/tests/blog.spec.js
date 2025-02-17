@@ -1,7 +1,14 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
-const data = {
+
+const user = {
 	name: "Matti Luukkainen",
 	username: "mluukkai",
+	password: "salainen",
+};
+
+const secondUser = {
+	name: "Testi Testaaja",
+	username: "testi",
 	password: "salainen",
 };
 
@@ -11,36 +18,53 @@ const blog = {
 	url: "http://google.com",
 };
 
-const loginFn = async (page) => {
-	await page.fill("#username-input", data.username);
-	await page.fill("#password-input", data.password);
-	await page.waitForSelector("#login-button", { state: "visible" });
+const loginFn = async (page, username, pass) => {
+	const usernameField = await page.getByTestId("username-input");
+	const passwordField = await page.getByTestId("password-input");
 
-	await page.locator("#login-button").click({ force: true });
+	await usernameField.fill(username);
+	await passwordField.fill(pass);
+
+	const loginButton = await page.getByTestId("login-button");
+
+	await expect(loginButton).toBeVisible();
+	await loginButton.click();
 };
 
 describe("Blog app", () => {
 	beforeEach(async ({ page, request }) => {
 		await request.post("/api/testing/reset");
-		await request.post("/api/user/register", { data });
+		await request.post("/api/user/register", {
+			data: user,
+		});
 
 		await page.goto("/");
 	});
 
 	test("Login form is shown", async ({ page }) => {
-		await expect(page.getByText("Username:")).toBeVisible();
-		await expect(page.getByText("Password:")).toBeVisible();
+		const usernameField = page.getByTestId("username-input");
+		const passwordField = page.getByTestId("password-input");
+
+		await expect(usernameField).toBeVisible();
+		await expect(passwordField).toBeVisible();
 	});
 
 	test("Test invalid login", async ({ page }) => {
-		await page.fill("#username-input", data.username);
-		await page.fill("#password-input", data.password + 1);
-		await page.waitForSelector("#login-button", { state: "visible" });
+		const usernameField = page.getByTestId("username-input");
+		const passwordField = page.getByTestId("password-input");
 
-		await page.locator("#login-button").click({ force: true });
+		await usernameField.fill(user.username);
+		await passwordField.fill(user.password + 1);
 
-		await expect(page.getByText("invalid username or password")).toBeVisible({
-			timeout: 10000, // incase db takes longer to receive and respond
+		const loginButton = page.getByTestId("login-button");
+		await expect(loginButton).toBeVisible();
+		await loginButton.click();
+
+		const statusMessage = page.getByTestId("status-message-div");
+
+		await expect(statusMessage).toBeVisible();
+		await expect(statusMessage).toHaveText("invalid username or password", {
+			timeout: 15000, // incase db takes longer to receive and respond
 		});
 
 		await page.screenshot({
@@ -49,11 +73,12 @@ describe("Blog app", () => {
 	});
 
 	test("Test successful login", async ({ page }) => {
-		await loginFn(page);
+		await loginFn(page, user.username, user.password);
 
-		await expect(page.getByText(`${data.name} logged in`)).toBeVisible({
-			timeout: 10000, // incase db takes longer to receive and respond
-		});
+		const userDiv = page.getByTestId("user-div");
+
+		await expect(userDiv).toBeVisible();
+		await expect(userDiv).toContainText(`${user.name} logged in`);
 
 		await page.screenshot({
 			path: "tests/screenshots/login-test-screenshot.png",
@@ -64,31 +89,41 @@ describe("Blog app", () => {
 describe("When logged in", () => {
 	beforeEach(async ({ page, request }) => {
 		await request.post("/api/testing/reset");
-		await request.post("/api/user/register", { data });
+		await request.post("/api/user/register", user);
 
 		await page.goto("/");
-		await loginFn(page);
+		await page.waitForTimeout(2000);
+		await loginFn(page, user.username, user.password);
 	});
 
 	test("a new blog can be created", async ({ page }) => {
-		await page.locator("#open-create-blog-button").click();
+		const openButton = page.getByTestId("open-create-blog-button");
+		await expect(openButton).toBeVisible();
+		await openButton.click();
 
 		await page.screenshot({
 			path: "tests/screenshots/blog-create-before-test-screenshot.png",
 		});
 
-		await page.fill("#title-input", blog.title);
-		await page.fill("#author-input", blog.author);
-		await page.fill("#url-input", blog.url);
+		const titleField = page.getByTestId("title-input");
+		const authorField = page.getByTestId("author-input");
+		const urlField = page.getByTestId("url-input");
 
-		await page.locator("#create-button").click();
+		await titleField.fill(blog.title);
+		await authorField.fill(blog.author);
+		await urlField.fill(blog.url);
 
-		await expect(
-			page.locator(
-				"#status-message-div",
-				`a new blog ${blog.title} by ${blog.author} added`,
-			),
-		).toBeVisible({ timeout: 20000 });
+		const createButton = page.getByTestId("create-button");
+		await expect(createButton).toBeVisible();
+		await createButton.click();
+
+		await page.waitForTimeout(2000);
+
+		const statusMessage = page.getByTestId("status-message-div");
+		await expect(statusMessage).toBeVisible();
+		await expect(statusMessage).toHaveText(
+			`a new blog ${blog.title} by ${blog.author} added`,
+		);
 
 		await page.screenshot({
 			path: "tests/screenshots/blog-create-after-test-screenshot.png",
@@ -96,28 +131,95 @@ describe("When logged in", () => {
 	});
 
 	test("blog can be liked", async ({ page }) => {
-		await page.locator("#open-create-blog-button").click({ timeout: 10000 });
-		await page.fill("#title-input", blog.title);
-		await page.fill("#author-input", blog.author);
-		await page.fill("#url-input", blog.url);
-		await page.locator("#create-button").click({ timeout: 10000 });
+		const openButton = page.getByTestId("open-create-blog-button");
+		await expect(openButton).toBeVisible();
+		await openButton.click();
 
-		await expect(page.locator("#blog-view-button").first()).toBeVisible({
-			timeout: 20000,
-		});
-		await page.locator("#blog-view-button").first().click();
+		const titleField = page.getByTestId("title-input");
+		const authorField = page.getByTestId("author-input");
+		const urlField = page.getByTestId("url-input");
+
+		await titleField.fill(blog.title);
+		await authorField.fill(blog.author);
+		await urlField.fill(blog.url);
+
+		const createButton = page.getByTestId("create-button");
+		await expect(createButton).toBeVisible();
+		await createButton.click();
+
+		await page.waitForTimeout(2000);
+
+		const viewButton = page.getByTestId("blog-view-button").first();
+		await expect(viewButton).toBeVisible();
+		await viewButton.click();
 
 		await page.screenshot({
 			path: "tests/screenshots/blog-like-before-test-screenshot.png",
 		});
 
-		await expect(page.locator("#blog-like-button")).toBeVisible();
-		await page.locator("#blog-like-button").click({ timeout: 10000 });
+		const likeButton = page.getByTestId("blog-like-button");
+		await expect(likeButton).toBeVisible();
+		await likeButton.click();
 
 		await page.screenshot({
 			path: "tests/screenshots/blog-like-after-test-screenshot.png",
 		});
 
-		expect(page.locator("#blog-likes-div").textContent("likes 1"));
+		const likesDiv = page.getByTestId("blog-likes-div");
+		await expect(likesDiv).toBeVisible();
+		await expect(likesDiv).toContainText("likes 1");
+	});
+
+	test("blog can be deleted by only original creator", async ({
+		page,
+		request,
+	}) => {
+		await request.post("/api/user/register", {
+			data: secondUser,
+		});
+
+		const openButton = page.getByTestId("open-create-blog-button");
+
+		await expect(openButton).toBeVisible();
+		await openButton.click();
+
+		const titleField = page.getByTestId("title-input");
+		const authorField = page.getByTestId("author-input");
+		const urlField = page.getByTestId("url-input");
+
+		await titleField.fill(blog.title);
+		await authorField.fill(blog.author);
+		await urlField.fill(blog.url);
+
+		const createButton = page.getByTestId("create-button");
+		await expect(createButton).toBeVisible();
+		await createButton.click();
+
+		await page.waitForTimeout(2000);
+
+		const viewButton = page.getByTestId("blog-view-button").first();
+		await expect(viewButton).toBeVisible();
+		await viewButton.click();
+
+		await page.screenshot({
+			path: "tests/screenshots/blog-like-after-test-screenshot.png",
+		});
+
+		const deleteButton = page.getByTestId("blog-delete-button");
+		await expect(deleteButton).toBeVisible();
+
+		const logoutButton = page.getByTestId("user-logout-button");
+		await expect(logoutButton).toBeVisible();
+		await logoutButton.click();
+
+		loginFn(page, secondUser.username, secondUser.password);
+
+		await expect(viewButton).toBeVisible();
+		await viewButton.click();
+
+		await expect(deleteButton).toBeHidden();
+		await page.screenshot({
+			path: "tests/screenshots/blog-remove-hidden-screenshot.png",
+		});
 	});
 });

@@ -20,12 +20,27 @@ const Login = ({ handleLogin }) => {
 	return (
 		<div>
 			<div>
-				Username: <input type="text" id="username-input" onChange={handleUsername} />
+				Username:{" "}
+				<input
+					type="text"
+					data-testid="username-input"
+					onChange={handleUsername}
+				/>
 			</div>
 			<div>
-				Password: <input type="password" id="password-input" onChange={handlePassword} />
+				Password:{" "}
+				<input
+					type="password"
+					data-testid="password-input"
+					onChange={handlePassword}
+				/>
 			</div>
-			<button type="button" id="login-button" disabled={isDisabled} onClick={clickLogin}>
+			<button
+				type="button"
+				data-testid="login-button"
+				disabled={isDisabled}
+				onClick={clickLogin}
+			>
 				Login
 			</button>
 			{/* <button type="button">cancel</button> */}

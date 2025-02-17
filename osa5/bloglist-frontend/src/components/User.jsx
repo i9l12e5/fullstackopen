@@ -1,9 +1,13 @@
 import PropTypes from "prop-types";
 
 const User = ({ data, handleClick }) => (
-	<div>
+	<div data-testid="user-div">
 		{data?.name || "Nimetön"} logged in{" "}
-		<button type="button" onClick={handleClick}>
+		<button
+			data-testid="user-logout-button"
+			type="button"
+			onClick={handleClick}
+		>
 			logout
 		</button>
 	</div>

@@ -13,7 +13,7 @@ const Blog = ({ blog, user, handleLikeAdd, handleRemove }) => {
 		<div style={{ border: "solid black 1px", padding: "3px" }}>
 			{blog.title} {blog.author}{" "}
 			<button
-				id="blog-view-button"
+				data-testid="blog-view-button"
 				type="button"
 				onClick={() => setInView(!inView)}
 			>
@@ -22,10 +22,10 @@ const Blog = ({ blog, user, handleLikeAdd, handleRemove }) => {
 			{inView ? (
 				<div>
 					<div>{blog.url}</div>
-					<div id="blog-likes-div">
+					<div data-testid="blog-likes-div">
 						likes {blog.likes}{" "}
 						<button
-							id="blog-like-button"
+							data-testid="blog-like-button"
 							type="button"
 							onClick={() => handleLikeAdd(blog)}
 						>
@@ -35,7 +35,11 @@ const Blog = ({ blog, user, handleLikeAdd, handleRemove }) => {
 					<div>{blog.user.username}</div>
 
 					{blog.user.id === user.id ? (
-						<button type="button" onClick={clickRemove}>
+						<button
+							data-testid="blog-delete-button"
+							type="button"
+							onClick={clickRemove}
+						>
 							remove
 						</button>
 					) : null}
