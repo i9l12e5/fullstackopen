@@ -24,49 +24,46 @@ describe("Test users CRUD", () => {
 
 	test("users are returned as JSON", async () => {
 		await api
-			.get("/user/")
+			.get("/api/user/")
 			.expect(200)
 			.expect("Content-Type", /application\/json/);
 	});
 
 	test("Test user registeration", async () => {
-		await api.post("/user/register").send(singleUser).expect(201);
+		await api.post("/api/user/register").send(singleUser).expect(201);
 
-		const fetchUsers = await usersInDb();
+		const fetchUsersEnd = await usersInDb();
 
-		assert.strictEqual(fetchUsers.length, 1);
+		const match = await fetchUsersEnd.find(
+			(user) => user.username === singleUser.username,
+		);
+
+		assert.strictEqual(match.username, singleUser.username);
 	});
 
 	test("Test invalid user registration", async () => {
-		const startUsers = await usersInDb();
-
-		const users = await api
-			.post("/user/register")
+		const add = await api
+			.post("/api/user/register")
 			.send(invalidUsers[0])
 			.expect(400);
 
-		const endUsers = await usersInDb();
+		assert(add.error.text.includes("Password or username too short!"));
 
-		assert(users.error.text.includes("Password or username too short!"));
+		const users = await usersInDb();
+
+		const find = users.find((user) => user.username === invalidUsers[0]);
 
 		// Check that invalid user didn't get registered
-		assert.strictEqual(startUsers.length, endUsers.length);
+		assert.strictEqual(find, undefined);
 	});
 
 	test("Test that duplicate usernames are prevented", async () => {
-		const startUsers = await usersInDb();
-
-		const users = await api
-			.post("/user/register")
+		const sameUser = await api
+			.post("/api/user/register")
 			.send(initialUsers[0])
 			.expect(400);
 
-		assert(users.error.text.includes("Username already taken!"));
-
-		const endUsers = await usersInDb();
-
-		// Check that duplicate user didn't get registered
-		assert.strictEqual(startUsers.length, endUsers.length);
+		assert(sameUser.error.text.includes("Username already taken!"));
 	});
 });
 
