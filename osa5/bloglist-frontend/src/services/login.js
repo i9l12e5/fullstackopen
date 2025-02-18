@@ -3,7 +3,7 @@ import { BASE_URL } from "../utils/config";
 
 const login = (data) =>
 	axios
-		.post(`${BASE_URL}/login`, data)
+		.post("/login", data)
 		.then((res) => {
 			return res;
 		})

@@ -3,12 +3,11 @@ import { BASE_URL } from "../utils/config";
 
 const API_PATH = "/api/blogs";
 
-const getAll = () =>
-	axios.get(BASE_URL + API_PATH).then((response) => response.data);
+const getAll = () => axios.get(API_PATH).then((response) => response.data);
 
 const postNew = (body, user) =>
 	axios
-		.post(BASE_URL + API_PATH, body, {
+		.post(API_PATH, body, {
 			headers: {
 				Authorization: `Bearer ${user.token}`,
 			},
@@ -16,12 +15,10 @@ const postNew = (body, user) =>
 		.then((response) => response);
 
 const addLike = (body) =>
-	axios
-		.put(`${BASE_URL}${API_PATH}/update/${body.id}`, body)
-		.then((response) => response);
+	axios.put(`${API_PATH}/update/${body.id}`, body).then((response) => response);
 
 const removeBlog = (blog, user) =>
-	axios.delete(`${BASE_URL}${API_PATH}/${blog}`, {
+	axios.delete(`${API_PATH}/${blog}`, {
 		headers: {
 			Authorization: `Bearer ${user}`,
 		},
