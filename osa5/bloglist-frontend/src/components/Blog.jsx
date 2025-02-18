@@ -20,7 +20,7 @@ const Blog = ({ blog, user, handleLikeAdd, handleRemove }) => {
 				view
 			</button>
 			{inView ? (
-				<div>
+				<div data-testid="blog-entry">
 					<div>{blog.url}</div>
 					<div data-testid="blog-likes-div">
 						likes {blog.likes}{" "}

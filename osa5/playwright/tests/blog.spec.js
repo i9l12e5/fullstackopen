@@ -139,6 +139,44 @@ describe("When logged in", () => {
 		await expect(likesDiv).toContainText("likes 1");
 	});
 
+	test("blog can be deleted", async ({ page, request }) => {
+		const openButton = page.getByTestId("open-create-blog-button");
+
+		await expect(openButton).toBeVisible();
+		await openButton.click();
+
+		const titleField = page.getByTestId("title-input");
+		const authorField = page.getByTestId("author-input");
+		const urlField = page.getByTestId("url-input");
+
+		await titleField.fill(blog.title);
+		await authorField.fill(blog.author);
+		await urlField.fill(blog.url);
+
+		const createButton = page.getByTestId("create-button");
+		await expect(createButton).toBeVisible();
+		await createButton.click();
+
+		const viewButton = page.getByTestId("blog-view-button").first();
+		await expect(viewButton).toBeVisible();
+		await viewButton.click();
+
+		page.on("dialog", async (dialog) => {
+			expect(dialog.message()).toContain(
+				`Remove blog ${blog.title} by ${blog.author}`,
+			);
+			await dialog.accept();
+		});
+
+		const deleteButton = page.getByTestId("blog-delete-button");
+		await expect(deleteButton).toBeVisible();
+		await deleteButton.click();
+
+		const status = page.getByTestId("status-message-div");
+		await expect(status).toBeVisible();
+		await expect(status).toContainText("blog removed successfully!");
+	});
+
 	test("blog can be deleted by only original creator", async ({
 		page,
 		request,
