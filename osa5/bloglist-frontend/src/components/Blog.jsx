@@ -10,7 +10,7 @@ const Blog = ({ blog, user, handleLikeAdd, handleRemove }) => {
 	};
 
 	return (
-		<div style={{ border: "solid black 1px", padding: "3px" }}>
+		<div data-testid="blog-entry" style={{ border: "solid black 1px", padding: "3px" }}>
 			{blog.title} {blog.author}{" "}
 			<button
 				data-testid="blog-view-button"
@@ -20,7 +20,7 @@ const Blog = ({ blog, user, handleLikeAdd, handleRemove }) => {
 				view
 			</button>
 			{inView ? (
-				<div data-testid="blog-entry">
+				<div data-testid="blog-entry-open">
 					<div>{blog.url}</div>
 					<div data-testid="blog-likes-div">
 						likes {blog.likes}{" "}

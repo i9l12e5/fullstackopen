@@ -220,4 +220,92 @@ describe("When logged in", () => {
 
 		await expect(deleteButton).toBeHidden();
 	});
+
+	test("Blogs are sorted by likes", async ({ page, browserName }) => {
+		const blogs = [
+			{
+				title: "Testi 1",
+				author: "Testaaja",
+				url: "http://google.com",
+			},
+
+			{
+				title: "Testi 2",
+				author: "Testaaja",
+				url: "http://google.com",
+			},
+			{
+				title: "Testi 3",
+				author: "Testaaja",
+				url: "http://google.com",
+			},
+			{
+				title: "Testi 4",
+				author: "Testaaja",
+				url: "http://google.com",
+			},
+		];
+
+		const createBlog = async (newBlog) => {
+			const openButton = page.getByTestId("open-create-blog-button");
+			await expect(openButton).toBeVisible();
+			await openButton.click();
+
+			const titleField = page.getByTestId("title-input");
+			const authorField = page.getByTestId("author-input");
+			const urlField = page.getByTestId("url-input");
+
+			await titleField.fill(newBlog.title);
+			await authorField.fill(newBlog.author);
+			await urlField.fill(newBlog.url);
+
+			const createButton = page.getByTestId("create-button");
+			await expect(createButton).toBeVisible();
+			await createButton.click();
+
+			const statusMessage = page.getByTestId("status-message-div");
+			await expect(statusMessage).toBeVisible();
+			await expect(statusMessage).toHaveText(
+				`a new blog ${newBlog.title} by ${newBlog.author} added`,
+			);
+		};
+
+		for (const newBlog of blogs) {
+			await createBlog(newBlog);
+		}
+
+		const entryDiv = page.getByTestId("blog-entry");
+		expect(entryDiv).toHaveCount(blogs.length);
+
+		for (let index = 0; index < blogs.length; index++) {
+			const viewButton = page.getByTestId("blog-view-button").nth(index);
+			await expect(viewButton).toBeVisible();
+			await viewButton.click();
+		}
+
+		const likeActions = [1, 0, 2, 0];
+
+		for (let index = 0; index < likeActions.length; index++) {
+			const element = likeActions[index];
+			const likeButton = page.getByTestId("blog-like-button").nth(element);
+			await expect(likeButton).toBeVisible();
+			await likeButton.click({ timeout: 10000 });
+
+			console.log(`Liked blog at index ${element}`);
+		}
+
+		await page.screenshot({
+			path: `./tests/screenshots/${browserName}-likes-open.png`,
+		});
+
+		const likes = page.getByTestId("blog-likes-div").first();
+
+		expect(likes).toBeVisible();
+
+		await page.screenshot({
+			path: `./tests/screenshots/${browserName}-likes-closed.png`,
+		});
+
+		expect(likes).toHaveText("likes 2 like");
+	});
 });
