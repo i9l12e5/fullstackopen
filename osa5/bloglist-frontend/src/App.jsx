@@ -118,7 +118,7 @@ const App = () => {
 			<Create user={user} handleSave={handleSave} />
 
 			{blogs
-				.sort((a, b) => a.likes < b.likes)
+				.sort((a, b) => b.likes - a.likes)
 				.map((blog) => (
 					<Blog
 						key={blog.id}
