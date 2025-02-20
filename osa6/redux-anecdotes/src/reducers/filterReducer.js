@@ -1,19 +1,16 @@
-const filterReducer = (state = [], action = {}) => {
-	switch (action.type) {
-		case "FILTER": {
-			return action.search; // passes the search word
-		}
+import { createSlice } from "@reduxjs/toolkit";
 
-		default:
-			return state; // ?
-	}
-};
+const initialState = "";
 
-export const filterAnectodes = (search) => {
-	return {
-		type: "FILTER",
-		search,
-	};
-};
+const filterSlice = createSlice({
+	name: "filter",
+	initialState,
+	reducers: {
+		searchAnectodes(state, action) {
+			return action.payload;
+		},
+	},
+});
 
-export default filterReducer;
+export const { searchAnectodes } = filterSlice.actions;
+export default filterSlice.reducer;

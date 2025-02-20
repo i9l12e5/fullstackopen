@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { createAnectode } from "../reducers/anecdoteReducer";
+import { newAnecdote } from "../reducers/anecdoteReducer";
 
 const AnecdoteForm = () => {
 	const dispatch = useDispatch();
 	const [anecdote, setAnecdote] = useState("");
 
-	const newAnectode = () => dispatch(createAnectode(anecdote));
+	const createAnectode = () => dispatch(newAnecdote(anecdote));
 
 	return (
 		<div>
@@ -15,7 +15,7 @@ const AnecdoteForm = () => {
 				<div>
 					<input onChange={(text) => setAnecdote(text.target.value)} />
 				</div>
-				<button type="button" onClick={newAnectode}>
+				<button type="button" onClick={createAnectode}>
 					create
 				</button>
 			</form>

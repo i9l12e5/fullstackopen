@@ -1,11 +1,11 @@
 import { useDispatch } from "react-redux";
-import { filterAnectodes } from "../reducers/filterReducer";
+import { searchAnectodes } from "../reducers/filterReducer";
 
 const Filter = () => {
 	const dispatch = useDispatch();
 
 	const handleChange = (event) => {
-		dispatch(filterAnectodes(event.target.value));
+		dispatch(searchAnectodes(event.target.value));
 	};
 
 	const style = {
