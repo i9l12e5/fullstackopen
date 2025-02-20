@@ -1,4 +1,4 @@
-const filterReducer = (state, action) => {
+const filterReducer = (state = [], action = {}) => {
 	switch (action.type) {
 		case "FILTER": {
 			return action.search; // passes the search word
