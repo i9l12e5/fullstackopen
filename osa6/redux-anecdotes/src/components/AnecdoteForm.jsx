@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { newAnecdote } from "../reducers/anecdoteReducer";
+import { hideNotification, showNotification } from "../reducers/notificationReducer";
 
 const AnecdoteForm = () => {
 	const dispatch = useDispatch();
 	const [anecdote, setAnecdote] = useState("");
 
-	const createAnectode = () => dispatch(newAnecdote(anecdote));
+	const createAnectode = () => {
+		dispatch(showNotification(`Added new anecdote: ${anecdote}.`));
+		dispatch(newAnecdote(anecdote));
+
+		const timeoutId = setTimeout(() => {
+			dispatch(hideNotification());
+		}, 5000);
+
+		return () => clearTimeout(timeoutId);
+	};
 
 	return (
 		<div>
