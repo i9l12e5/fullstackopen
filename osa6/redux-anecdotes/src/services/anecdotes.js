@@ -13,7 +13,7 @@ const saveOne = async (body) => {
 };
 
 const updateVote = async (body) => {
-	const response = await axios.put(baseUrl, body);
+	const response = await axios.put(`${baseUrl}/${body.id}`, body);
 	return response.data;
 };
 

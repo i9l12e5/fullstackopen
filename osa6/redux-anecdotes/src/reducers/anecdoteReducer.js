@@ -23,7 +23,11 @@ const anecdoteSlice = createSlice({
 				votes: anecdoteToChange.votes + 1,
 			};
 
-			/* anecdoteService.updateVote(changedAnecdote); */
+			// Save vote increment to db
+			const response = async () =>
+				await anecdoteService.updateVote(changedAnecdote);
+
+			response();
 
 			return state.map((anecdote) =>
 				anecdote.id !== id ? anecdote : changedAnecdote,
@@ -54,7 +58,7 @@ export const initializeAnecdotes = () => {
 };
 
 export const createAnecdote = (anecdote) => {
-	return async (dispatch) => {
+	return (dispatch) => {
 		dispatch(showNotification(`Added new anecdote: ${anecdote}.`));
 		dispatch(newAnecdote(anecdote));
 
@@ -66,4 +70,16 @@ export const createAnecdote = (anecdote) => {
 	};
 };
 
+export const handleVote = (anecdote) => {
+	return (dispatch) => {
+		dispatch(showNotification(`you voted '${anecdote.content}'`));
+		dispatch(addVote(anecdote.id));
+
+		const timeoutId = setTimeout(() => {
+			dispatch(hideNotification());
+		}, 5000);
+
+		return clearTimeout(timeoutId);
+	};
+};
 export default anecdoteSlice.reducer;
