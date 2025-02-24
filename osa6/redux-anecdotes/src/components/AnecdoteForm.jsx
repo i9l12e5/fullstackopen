@@ -1,28 +1,12 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { newAnecdote } from "../reducers/anecdoteReducer";
-import {
-	hideNotification,
-	showNotification,
-} from "../reducers/notificationReducer";
-import anecdoteService from "../services/anecdotes";
+import { createAnecdote } from "../reducers/anecdoteReducer";
 
 const AnecdoteForm = () => {
 	const dispatch = useDispatch();
 	const [anecdote, setAnecdote] = useState("");
 
-	const createAnectode = async () => {
-
-
-		dispatch(showNotification(`Added new anecdote: ${anecdote}.`));
-		dispatch(newAnecdote(anecdote));
-
-		const timeoutId = setTimeout(() => {
-			dispatch(hideNotification());
-		}, 5000);
-
-		return () => clearTimeout(timeoutId);
-	};
+	const handleAnectode = async () => dispatch(createAnecdote(anecdote));
 
 	return (
 		<div>
@@ -31,7 +15,7 @@ const AnecdoteForm = () => {
 				<div>
 					<input onChange={(text) => setAnecdote(text.target.value)} />
 				</div>
-				<button type="button" onClick={createAnectode}>
+				<button type="button" onClick={handleAnectode}>
 					create
 				</button>
 			</form>
