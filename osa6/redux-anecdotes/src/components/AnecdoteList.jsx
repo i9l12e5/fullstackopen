@@ -14,7 +14,7 @@ const AnecdoteList = () => {
 		return state.anecdotes;
 	});
 
-	const vote = (anecdote) => dispatch(handleVote(anecdote));
+	const vote = (anecdote) => dispatch(handleVote(anecdote, 5));
 
 	if (anecdotes.length < 1) return null;
 

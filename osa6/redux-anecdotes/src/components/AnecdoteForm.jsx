@@ -6,7 +6,7 @@ const AnecdoteForm = () => {
 	const dispatch = useDispatch();
 	const [anecdote, setAnecdote] = useState("");
 
-	const handleAnectode = async () => dispatch(createAnecdote(anecdote));
+	const handleAnectode = async () => dispatch(createAnecdote(anecdote, 5));
 
 	return (
 		<div>

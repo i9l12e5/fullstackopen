@@ -57,29 +57,25 @@ export const initializeAnecdotes = () => {
 	};
 };
 
-export const createAnecdote = (anecdote) => {
+export const createAnecdote = (anecdote, timer) => {
 	return (dispatch) => {
 		dispatch(showNotification(`Added new anecdote: ${anecdote}.`));
 		dispatch(newAnecdote(anecdote));
 
-		const timeoutId = setTimeout(() => {
+		setTimeout(() => {
 			dispatch(hideNotification());
-		}, 5000);
-
-		return clearTimeout(timeoutId);
+		}, timer * 1000);
 	};
 };
 
-export const handleVote = (anecdote) => {
+export const handleVote = (anecdote, timer) => {
 	return (dispatch) => {
 		dispatch(showNotification(`you voted '${anecdote.content}'`));
 		dispatch(addVote(anecdote.id));
 
-		const timeoutId = setTimeout(() => {
+		setTimeout(() => {
 			dispatch(hideNotification());
-		}, 5000);
-
-		return clearTimeout(timeoutId);
+		}, timer * 1000);
 	};
 };
 export default anecdoteSlice.reducer;
