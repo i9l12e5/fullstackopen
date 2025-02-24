@@ -44,4 +44,10 @@ const anecdoteSlice = createSlice({
 
 export const { addVote, newAnecdote, appendAnecdote, setAnecdote } =
 	anecdoteSlice.actions;
+
+export const initializeAnecdotes = () =>
+	anecdoteService.getAll().then((anecdote) => {
+		store.dispatch(setAnecdote(anecdote));
+	});
+
 export default anecdoteSlice.reducer;
