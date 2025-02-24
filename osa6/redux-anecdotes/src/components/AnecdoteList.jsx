@@ -9,7 +9,7 @@ const AnecdoteList = () => {
 	const filter = useSelector((state) => state.filter);
 
 	const anecdotes = useSelector((state) => {
-		if (filter !== "")
+		if (filter && filter !== "")
 			return state.anecdotes.filter((anecdote) =>
 				anecdote.content.toLowerCase().includes(state.search),
 			);
@@ -18,7 +18,8 @@ const AnecdoteList = () => {
 	});
 
 	const dispatch = useDispatch();
-	const vote = (anecdote) => {
+	const vote = async (anecdote) => {
+
 		dispatch(showNotification(`you voted '${anecdote.content}'`));
 		dispatch(addVote(anecdote.id));
 
@@ -31,8 +32,9 @@ const AnecdoteList = () => {
 
 	if (anecdotes.length < 1) return null;
 
-	return anecdotes
-		.sort((a, b) => b.votes - a.votes)
+	const sortedAnecdotes = [...anecdotes].sort((a, b) => b.votes - a.votes);
+
+	return sortedAnecdotes
 		.map((anecdote) => (
 			<div key={anecdote.id}>
 				<div>{anecdote.content}</div>
